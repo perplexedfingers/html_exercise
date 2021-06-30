@@ -33,11 +33,13 @@ const computeStatus = (board, mark) => {
 const isNotMarked = (element) => element.innerText !== "true"
   && element.innerText !== "false"
 
-const mark = (board, element, play) => {
-  element.innerText = `${play}`;
+const drawElement = (element, mark) => element.innerText = `${mark}`;
+
+const mark = (board, element, mark) => {
   const index = Array.from(element.parentNode.children)
     .findIndex(e => e === element);
-  board[index] = play;
+  board[index] = mark;
+  drawElement(element, mark);
   return board
 }
 
@@ -69,7 +71,7 @@ const tickFlow = (e) => {
         showResult(STATUS);
       }
     } else {
-      // TODO some notification?
+      // TODO show notification?
     }
   } else {
     showResult(STATUS);
