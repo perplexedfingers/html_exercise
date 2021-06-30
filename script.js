@@ -11,34 +11,32 @@ const diags = [[0, 4, 8], [2, 4, 6]];
 const lines = [...rows, ...columns, ...diags];
 
 
-function isEndGame() {
-  // TODO just check the new choice and related conditions
-  return lines.some(inds => inds.every(ind => board[ind] !== null)
-    && (board[inds[0]] === board[inds[1]] === board[inds[2]])
-  )
-}
+// TODO just check the new choice and related conditions
+const isEndGame = () => lines.some(
+  inds => (inds.every(ind => board[ind] === current))
+)
 
-function isNotMarked(element) {
-  return element.innerText !== "true"
-    && element.innerText !== "false"
-}
+const isNotMarked = (element) => element.innerText !== "true"
+  && element.innerText !== "false"
 
-function mark(currentElement) {
+const mark = (currentElement) => {
   currentElement.innerText = `${current}`;
   const index = Array.from(currentElement.parentNode.children)
     .findIndex(e => e === currentElement);
   board[index] = current;
 }
 
-function nextRound() {
+const celebrate = () => alert(`Player "${current}" wins`)
+
+const nextRound = () => {
   if (isEndGame()) {
-    alert(`Player "${current}" wins`)
+    celebrate();
   } else {
     current = !current;
   }
 }
 
-function tickFlow(e) {
+const tickFlow = (e) => {
   e.preventDefault();
   e.stopPropagation();
 
@@ -46,8 +44,10 @@ function tickFlow(e) {
     const currentElement = e.target;
     if (isNotMarked(currentElement)) {
       mark(currentElement);
-      nextRound()
+      nextRound();
     }
+  } else {
+    celebrate();
   }
 }
 
