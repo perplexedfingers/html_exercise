@@ -1,0 +1,18 @@
+#background{
+  display: inline-block;
+  background-color: black;
+}
+
+.game{
+  display: grid;
+  grid-template: repeat(3, max(10vh, 10vw)) / repeat(3, max(10vw, 10vw));
+  gap: 1%;
+}
+
+.game > .box {
+  background-color: white;
+}
+
+.box:hover {
+  background: lightgreen;
+}
