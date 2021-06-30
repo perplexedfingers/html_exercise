@@ -19,7 +19,7 @@ const isFull = (board) => board.every(cell => cell !== null);
 const marksInLine = (board, index, mark) => LINES
   .filter(inds => inds.includes(index))
   .some(inds => inds.every(ind => board[ind] === mark)
-)
+);
 const computeStatus = (board, index, mark) => {
   if (marksInLine(board, index, mark)) {
     return mark
@@ -28,24 +28,24 @@ const computeStatus = (board, index, mark) => {
   } else {
     return IN_GAME
   }
-}
+};
 
 const drawElement = (element, mark) => element.innerText = `${mark}`;
 
 const markBoard = (board, index, mark) => {
   board[index] = mark;
   return board
-}
+};
 
-const celebrate = (result) => alert(`Player "${result}" wins`)
-const callDraw = () => alert("Draw game")
+const celebrate = (result) => alert(`Player "${result}" wins`);
+const callDraw = () => alert("Draw game");
 const showResult = (result) => {
   if (result === true || result === false) {
     celebrate(result);
   } else if (result === DRAW) {
-    callDraw()
+    callDraw();
   }
-}
+};
 
 const tickFlow = (e) => {
   e.preventDefault();
@@ -58,7 +58,7 @@ const tickFlow = (e) => {
     if (BOARD[index] === null) {
       const board = markBoard(BOARD, index, CURRENT);
       drawElement(element, CURRENT);
-      const status = computeStatus(board, index, CURRENT)
+      const status = computeStatus(board, index, CURRENT);
 
       BOARD = board;
       STATUS = status;
@@ -73,7 +73,7 @@ const tickFlow = (e) => {
   } else {
     showResult(STATUS);
   }
-}
+};
 
 document.querySelectorAll("main > #background > .game > .box")
-  .forEach(box => box.addEventListener('click', tickFlow))
+  .forEach(box => box.addEventListener('click', tickFlow));
