@@ -15,13 +15,13 @@ const diags = [[0, 4, 8], [2, 4, 6]];
 const LINES = [...rows, ...columns, ...diags];
 
 
-// TODO just check the new choice and related conditions
 const isFull = (board) => board.every(cell => cell !== null);
-const marksInLine = (board, mark) => LINES.some(
-  inds => (inds.every(ind => board[ind] === mark))
+const marksInLine = (board, index, mark) => LINES
+  .filter(inds => inds.includes(index))
+  .some(inds => inds.every(ind => board[ind] === mark)
 )
-const computeStatus = (board, mark) => {
-  if (marksInLine(board, mark)) {
+const computeStatus = (board, index, mark) => {
+  if (marksInLine(board, index, mark)) {
     return mark
   } else if (isFull(board)) {
     return DRAW
@@ -30,16 +30,10 @@ const computeStatus = (board, mark) => {
   }
 }
 
-const isNotMarked = (element) => element.innerText !== "true"
-  && element.innerText !== "false"
-
 const drawElement = (element, mark) => element.innerText = `${mark}`;
 
-const mark = (board, element, mark) => {
-  const index = Array.from(element.parentNode.children)
-    .findIndex(e => e === element);
+const markBoard = (board, index, mark) => {
   board[index] = mark;
-  drawElement(element, mark);
   return board
 }
 
@@ -59,15 +53,18 @@ const tickFlow = (e) => {
 
   if (STATUS === IN_GAME) {
     const element = e.target;
-    if (isNotMarked(element)) {
-      const newBoard = mark(BOARD, element, CURRENT);
-      const status = computeStatus(newBoard, CURRENT)
+    const index = Array.from(element.parentNode.children)
+      .findIndex(e => e === element);
+    if (BOARD[index] === null) {
+      const board = markBoard(BOARD, index, CURRENT);
+      drawElement(element, CURRENT);
+      const status = computeStatus(board, index, CURRENT)
 
-      if (status === IN_GAME) {
+      BOARD = board;
+      STATUS = status;
+      if (STATUS === IN_GAME) {
         CURRENT = !CURRENT;
-        BOARD = newBoard;
       } else {
-        STATUS = status;
         showResult(STATUS);
       }
     } else {
