@@ -30,7 +30,55 @@ const computeStatus = (board, index, mark) => {
   }
 };
 
-const drawElement = (element, mark) => element.innerText = `${mark}`;
+const LINE_WIDTH = 10;
+
+const genCircle = () => {
+  const circle = document.createElementNS(
+    'http://www.w3.org/2000/svg', 'circle'
+  );
+  circle.setAttribute('stroke', 'black');
+  circle.setAttribute('fill', 'white');
+  circle.setAttribute('stroke-width', `${LINE_WIDTH}`);
+  circle.setAttribute('r', `${LINE_WIDTH * 3.5}`);
+  circle.setAttribute('cx', '50%');
+  circle.setAttribute('cy', '50%');
+
+  const title = document.createElement('title');
+  title.text = "Circle";
+  circle.appendChild(title);
+  return circle
+}
+
+const genCross = () => {
+  const cross = document.createElementNS(
+    'http://www.w3.org/2000/svg', 'path'
+  );
+  cross.setAttribute('stroke', 'black');
+  cross.setAttribute('fill', 'white');
+  cross.setAttribute('stroke-width', `${LINE_WIDTH}`);
+  cross.setAttribute('d', 'M 15,15 L 85,85 M 85,15 L 15,85');
+
+  const title = document.createElement('title');
+  title.text = "Cross";
+  cross.appendChild(title);
+  return cross
+}
+
+const genSVGContainer = () => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', '100%');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  return svg
+}
+
+const drawMark = (node, mark) => {
+  Array.from(node.childNodes).forEach(e => node.removeChild(e));
+  const svg = genSVGContainer();
+  const shape = mark === true ? genCircle() : genCross();
+  svg.appendChild(shape)
+  return node.appendChild(svg);
+};
 
 const markBoard = (board, index, mark) => {
   board[index] = mark;
@@ -92,7 +140,10 @@ const reset = (e) => {
   ];
 
   document.querySelectorAll("main > #background > .game > .box")
-    .forEach((box, index) => box.innerText = `${index + 1}`);
+    .forEach((box, index) => {
+      Array.from(box.childNodes).forEach(e => box.removeChild(e));
+      box.innerText = `${index + 1}`
+    });
 };
 
 document.querySelector("main > button[type='reset']")
