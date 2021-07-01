@@ -100,12 +100,14 @@ const tickFlow = (e) => {
   e.stopPropagation();
 
   if (STATUS === IN_GAME) {
-    const element = e.target;
-    const index = Array.from(element.parentNode.children)
-      .findIndex(e => e === element);
-    if (BOARD[index] === null) {
+    const node = e.currentTarget;
+    const index = Array
+      .from(document
+        .querySelector("main > #background > .game").children)
+      .findIndex(e => e === node);
+    if (index !== -1 && BOARD[index] === null) {
       const board = markBoard(BOARD, index, CURRENT);
-      drawElement(element, CURRENT);
+      drawMark(node, CURRENT);
       const status = computeStatus(board, index, CURRENT);
 
       BOARD = board;
