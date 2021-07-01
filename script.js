@@ -77,3 +77,23 @@ const tickFlow = (e) => {
 
 document.querySelectorAll("main > #background > .game > .box")
   .forEach(box => box.addEventListener('click', tickFlow));
+
+
+const reset = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  STATUS = IN_GAME;
+  CURRENT = true;
+  BOARD = [
+    null, null, null,
+    null, null, null,
+    null, null, null
+  ];
+
+  document.querySelectorAll("main > #background > .game > .box")
+    .forEach((box, index) => box.innerText = `${index + 1}`);
+};
+
+document.querySelector("main > button[type='reset']")
+  .addEventListener('click', reset);
