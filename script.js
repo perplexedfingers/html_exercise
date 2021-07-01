@@ -1,5 +1,5 @@
-const DRAW = 'draw';
-const IN_GAME = 'in game';
+const DRAW = "draw";
+const IN_GAME = "in game";
 let STATUS = IN_GAME;
 
 let CURRENT = true;  // If `true` => O, else X
@@ -34,50 +34,40 @@ const LINE_WIDTH = 10;
 
 const genCircle = () => {
   const circle = document.createElementNS(
-    'http://www.w3.org/2000/svg', 'circle'
+    "http://www.w3.org/2000/svg", "circle"
   );
-  circle.setAttribute('stroke', 'black');
-  circle.setAttribute('fill', 'white');
-  circle.setAttribute('stroke-width', `${LINE_WIDTH}`);
-  circle.setAttribute('r', `${LINE_WIDTH * 3.5}`);
-  circle.setAttribute('cx', '50%');
-  circle.setAttribute('cy', '50%');
+  circle.setAttribute("stroke", "black");
+  circle.setAttribute("fill", "transparent");
+  circle.setAttribute("stroke-width", `${LINE_WIDTH}`);
+  circle.setAttribute("r", `${LINE_WIDTH * 3.5}`);
+  circle.setAttribute("cx", "50%");
+  circle.setAttribute("cy", "50%");
 
-  const title = document.createElement('title');
-  title.text = "Circle";
+  const title = document.createElement("title");
+  title.text = "O";
   circle.appendChild(title);
   return circle
 }
 
 const genCross = () => {
   const cross = document.createElementNS(
-    'http://www.w3.org/2000/svg', 'path'
+    "http://www.w3.org/2000/svg", "path"
   );
-  cross.setAttribute('stroke', 'black');
-  cross.setAttribute('fill', 'white');
-  cross.setAttribute('stroke-width', `${LINE_WIDTH}`);
-  cross.setAttribute('d', 'M 15,15 L 85,85 M 85,15 L 15,85');
+  cross.setAttribute("stroke", "black");
+  cross.setAttribute("fill", "transparent");
+  cross.setAttribute("stroke-width", `${LINE_WIDTH}`);
+  cross.setAttribute("d", "M 15,15 L 85,85 M 85,15 L 15,85");
 
-  const title = document.createElement('title');
-  title.text = "Cross";
+  const title = document.createElement("title");
+  title.text = "X";
   cross.appendChild(title);
   return cross
 }
 
-const genSVGContainer = () => {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
-  svg.setAttribute('viewBox', '0 0 100 100');
-  return svg
-}
-
 const drawMark = (node, mark) => {
   Array.from(node.childNodes).forEach(e => node.removeChild(e));
-  const svg = genSVGContainer();
   const shape = mark === true ? genCircle() : genCross();
-  svg.appendChild(shape)
-  return node.appendChild(svg);
+  return node.appendChild(shape);
 };
 
 const markBoard = (board, index, mark) => {
@@ -103,7 +93,8 @@ const tickFlow = (e) => {
     const node = e.currentTarget;
     const index = Array
       .from(document
-        .querySelector("main > #background > .game").children)
+        .querySelector("#board").children)
+      .filter(e => Array.from(e.classList).includes("cell"))
       .findIndex(e => e === node);
     if (index !== -1 && BOARD[index] === null) {
       const board = markBoard(BOARD, index, CURRENT);
@@ -114,7 +105,10 @@ const tickFlow = (e) => {
       STATUS = status;
       if (STATUS === IN_GAME) {
         CURRENT = !CURRENT;
+        node.removeEventListener("click", tickFlow);
       } else {
+        document.querySelectorAll("#board > .cell")
+          .forEach(cell => cell.removeEventListener("click", tickFlow));
         showResult(STATUS);
       }
     } else {
@@ -125,8 +119,16 @@ const tickFlow = (e) => {
   }
 };
 
-document.querySelectorAll("main > #background > .game > .box")
-  .forEach(box => box.addEventListener('click', tickFlow));
+const resetBox = () => {
+  document.querySelectorAll("#board > .cell")
+    .forEach(cell => {
+      Array.from(cell.childNodes).forEach(e => cell.removeChild(e))
+      cell.addEventListener("click", tickFlow)
+    });
+}
+
+
+resetBox();  // set up boxes
 
 
 const reset = (e) => {
@@ -141,12 +143,8 @@ const reset = (e) => {
     null, null, null
   ];
 
-  document.querySelectorAll("main > #background > .game > .box")
-    .forEach((box, index) => {
-      Array.from(box.childNodes).forEach(e => box.removeChild(e));
-      box.innerText = `${index + 1}`
-    });
+  resetBox();
 };
 
 document.querySelector("main > button[type='reset']")
-  .addEventListener('click', reset);
+  .addEventListener("click", reset);

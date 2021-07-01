@@ -1,18 +1,25 @@
-#background{
+main {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#gapLine{
   display: inline-block;
   background-color: black;
 }
 
-.game{
+#board{
   display: grid;
-  grid-template: repeat(3, max(10vh, 10vw)) / repeat(3, max(10vw, 10vw));
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
   gap: 1%;
 }
 
-.game > .box {
+#board > .cell {
   background-color: white;
-}
-
-.box:hover {
-  background: lightgreen;
+  min-width: max(5vh, 5vw);
+  min-height: max(5vh, 5vw);
+  max-width: min(25vh, 25vw);
+  max-height: min(25vh, 25vw);
 }
