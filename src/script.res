@@ -1,3 +1,9 @@
+type document
+type htmlElement
+@val external document: document = "document"
+@send external querySelector: (document, string) => htmlElement = "querySelector"
+@send external addEventListener: (htmlElement, string, 'a) => unit = "addEventListener"
+
 let draw = 10
 let in_game = 9
 
@@ -151,7 +157,4 @@ let reset = %raw(`(e) => {
 }
 `)
 
-%%raw(`
-document.querySelector("main > button[type='reset']")
-  .addEventListener("click", reset);
-  `)
+addEventListener(querySelector(document, "main > button[type='reset']"), "click", reset)

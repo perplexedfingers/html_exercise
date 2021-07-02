@@ -208,9 +208,7 @@ var reset = ((e) => {
   resetBox();
 });
 
-document.querySelector("main > button[type='reset']")
-  .addEventListener("click", reset);
-;
+document.querySelector("main > button[type='reset']").addEventListener("click", reset);
 
 var draw = 10;
 
