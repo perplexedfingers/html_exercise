@@ -149,7 +149,7 @@ function showResult(result) {
   
 }
 
-const tickFlow = (e) => {
+var tickFlow = ((e) => {
   e.preventDefault();
   e.stopPropagation();
 
@@ -181,8 +181,7 @@ const tickFlow = (e) => {
   } else {
     showResult(game.status);
   }
-};
-;
+});
 
 var resetBox = (() => {
   document.querySelectorAll("#board > .cell")
@@ -238,6 +237,7 @@ export {
   celebrate ,
   callDraw ,
   showResult ,
+  tickFlow ,
   resetBox ,
   reset ,
   

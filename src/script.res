@@ -87,8 +87,7 @@ let showResult = (result) => {
   ()
 };
 
-%%raw(`
-const tickFlow = (e) => {
+let tickFlow = %raw(`(e) => {
   e.preventDefault();
   e.stopPropagation();
 
@@ -120,7 +119,7 @@ const tickFlow = (e) => {
   } else {
     showResult(game.status);
   }
-};
+}
   `)
 
 let resetBox = %raw(`() => {
