@@ -121,20 +121,22 @@ const tickFlow = (e) => {
     showResult(game.status);
   }
 };
+  `)
 
-const resetBox = () => {
+let resetBox = %raw(`() => {
   document.querySelectorAll("#board > .cell")
     .forEach(cell => {
       Array.from(cell.childNodes).forEach(e => cell.removeChild(e))
       cell.addEventListener("click", tickFlow)
     });
 }
+`)
 
 
-resetBox();  // set up boxes
+resetBox()  // set up boxes
 
 
-const reset = (e) => {
+let reset = %raw(`(e) => {
   e.preventDefault();
   e.stopPropagation();
 
@@ -147,8 +149,10 @@ const reset = (e) => {
   ];
 
   resetBox();
-};
+}
+`)
 
+%%raw(`
 document.querySelector("main > button[type='reset']")
   .addEventListener("click", reset);
   `)

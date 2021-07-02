@@ -182,20 +182,19 @@ const tickFlow = (e) => {
     showResult(game.status);
   }
 };
+;
 
-const resetBox = () => {
+var resetBox = (() => {
   document.querySelectorAll("#board > .cell")
     .forEach(cell => {
       Array.from(cell.childNodes).forEach(e => cell.removeChild(e))
       cell.addEventListener("click", tickFlow)
     });
-}
+});
 
+Curry._1(resetBox, undefined);
 
-resetBox();  // set up boxes
-
-
-const reset = (e) => {
+var reset = ((e) => {
   e.preventDefault();
   e.stopPropagation();
 
@@ -208,7 +207,7 @@ const reset = (e) => {
   ];
 
   resetBox();
-};
+});
 
 document.querySelector("main > button[type='reset']")
   .addEventListener("click", reset);
@@ -239,6 +238,8 @@ export {
   celebrate ,
   callDraw ,
   showResult ,
+  resetBox ,
+  reset ,
   
 }
 /* lines Not a pure module */
