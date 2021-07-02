@@ -125,26 +125,35 @@ var genCross = (() => {
   return cross
 });
 
-var drawMark = ((node, mark) => {
-  Array.from(node.childNodes).forEach(e => node.removeChild(e));
-  const shape = mark === 1 ? genCircle() : genCross();
+function drawMark(node, mark) {
+  Belt_Array.forEach(node.childNodes, (function (param) {
+          node.remove();
+          
+        }));
+  var shape = mark === 1 ? Curry._1(genCircle, undefined) : Curry._1(genCross, undefined);
   return node.appendChild(shape);
-});
+}
 
 function markBoard(board, index, mark) {
   Caml_array.set(board, index, mark);
   return board;
 }
 
-var celebrate = ((result) => alert("Player " + result.toString() + " wins"));
+function celebrate(result) {
+  alert("Player " + result + " wins");
+  
+}
 
-var callDraw = (() => alert("Draw game"));
+function callDraw(param) {
+  alert("Draw game");
+  
+}
 
 function showResult(result) {
   if (result === 1 || result === 2) {
-    celebrate(result);
+    celebrate(String(result));
   } else if (result === 10) {
-    Curry._1(callDraw, undefined);
+    alert("Draw game");
   }
   
 }
@@ -183,30 +192,27 @@ var tickFlow = ((e) => {
   }
 });
 
-var resetBox = (() => {
-  document.querySelectorAll("#board > .cell")
-    .forEach(cell => {
-      Array.from(cell.childNodes).forEach(e => cell.removeChild(e))
-      cell.addEventListener("click", tickFlow)
-    });
-});
+function resetBox(param) {
+  return Belt_Array.forEach(document.querySelectorAll("#board > .cell"), (function (cell) {
+                Belt_Array.forEach(cell.childNodes, (function (e) {
+                        cell.removeChild(e);
+                        
+                      }));
+                cell.addEventListener("click", tickFlow);
+                
+              }));
+}
 
-Curry._1(resetBox, undefined);
+resetBox(undefined);
 
-var reset = ((e) => {
+function reset(e) {
   e.preventDefault();
   e.stopPropagation();
-
-  game.status = in_game;
-  game.current = 1;  // 1 for Circle; 2 for Cross
-  game.board = [
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0
-  ];
-
-  resetBox();
-});
+  game.status = 9;
+  game.current = 1;
+  game.board = Belt_Array.make(9, 0);
+  return resetBox(undefined);
+}
 
 document.querySelector("main > button[type='reset']").addEventListener("click", reset);
 

@@ -1,7 +1,18 @@
+@val external alert: (string) => () = "alert"
+
+type rec htmlElement = {
+  childNodes: array<htmlElement>
+}
+@send external preventDefault: (htmlElement) => () = "preventDefault"
+@send external stopPropagation: (htmlElement) => () = "stopPropagation"
+@send external remove: (htmlElement) => () = "remove"
+@send external removeChild: (htmlElement, htmlElement) => () = "removeChild"
+@send external appendChild: (htmlElement, 'a) => htmlElement = "appendChild"
+
 type document
-type htmlElement
 @val external document: document = "document"
 @send external querySelector: (document, string) => htmlElement = "querySelector"
+@send external querySelectorAll: (document, string) => array<htmlElement> = "querySelectorAll"
 @send external addEventListener: (htmlElement, string, 'a) => unit = "addEventListener"
 
 let draw = 10
@@ -12,10 +23,15 @@ let columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
 let diags = [[0, 4, 8], [2, 4, 6]]
 let lines = Belt.Array.concatMany([rows, columns, diags])
 
+type game = {
+  mutable status: int,
+  mutable current: int,
+  mutable board: array<int>
+}
 let game = {
-  "status": in_game,
-  "current": 1,
-  "board": Belt.Array.make(9, 0),
+  status: in_game,
+  current: 1,  // 1 for Circle; 2 for Cross
+  board: Belt.Array.make(9, 0),
 }
 
 let line_width = 10
@@ -70,25 +86,24 @@ let genCross = %raw(`
 }
 `)
 
-let drawMark = %raw(`(node, mark) => {
-  Array.from(node.childNodes).forEach(e => node.removeChild(e));
-  const shape = mark === 1 ? genCircle() : genCross();
-  return node.appendChild(shape);
+let drawMark = (node, mark) => {
+  Belt.Array.forEach(node.childNodes, _ => remove(node))
+  let shape = mark === 1 ? genCircle() : genCross()
+  appendChild(node, shape)
 }
-`)
 
 let markBoard = (board, index, mark) => {
   board[index] = mark
   board
 }
 
-let celebrate = %raw(`(result) => alert("Player " + result.toString() + " wins")`)
-let callDraw = %raw(`() => alert("Draw game")`)
+let celebrate = (result) => alert(`Player ${result} wins`)
+let callDraw = () => alert("Draw game")
 let showResult = (result) => {
   if result === 1 || result === 2 {
-    celebrate(result);
+    celebrate(Belt.Int.toString(result))
   } else if result === draw {
-    callDraw();
+    callDraw()
   }
   ()
 };
@@ -128,33 +143,28 @@ let tickFlow = %raw(`(e) => {
 }
   `)
 
-let resetBox = %raw(`() => {
-  document.querySelectorAll("#board > .cell")
-    .forEach(cell => {
-      Array.from(cell.childNodes).forEach(e => cell.removeChild(e))
-      cell.addEventListener("click", tickFlow)
-    });
+let resetBox = () => {
+  querySelectorAll(document, "#board > .cell")
+  -> Belt.Array.forEach(cell =>{
+    Belt.Array.forEach(cell.childNodes, e => removeChild(cell, e))
+    addEventListener(cell, "click", tickFlow)
+  }
+  )
 }
-`)
 
 
 resetBox()  // set up boxes
 
 
-let reset = %raw(`(e) => {
-  e.preventDefault();
-  e.stopPropagation();
+let reset = (e) => {
+  preventDefault(e)
+  stopPropagation(e)
 
-  game.status = in_game;
-  game.current = 1;  // 1 for Circle; 2 for Cross
-  game.board = [
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0
-  ];
-
+  game.status = in_game
+  game.current = 1
+  game.board = Belt.Array.make(9, 0)
   resetBox();
 }
-`)
 
-addEventListener(querySelector(document, "main > button[type='reset']"), "click", reset)
+querySelector(document, "main > button[type='reset']")
+-> addEventListener("click", reset)
