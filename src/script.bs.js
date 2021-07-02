@@ -92,7 +92,7 @@ function computeStatus(board, index, mark) {
   }
 }
 
-const genCircle = () => {
+var genCircle = (() => {
   const circle = document.createElementNS(
     "http://www.w3.org/2000/svg", "circle"
   );
@@ -107,9 +107,9 @@ const genCircle = () => {
   title.text = "O";
   circle.appendChild(title);
   return circle
-}
+});
 
-const genCross = () => {
+var genCross = (() => {
   const cross = document.createElementNS(
     "http://www.w3.org/2000/svg", "path"
   );
@@ -122,21 +122,23 @@ const genCross = () => {
   title.text = "X";
   cross.appendChild(title);
   return cross
-}
+});
 
-const drawMark = (node, mark) => {
+var drawMark = ((node, mark) => {
   Array.from(node.childNodes).forEach(e => node.removeChild(e));
   const shape = mark === 1 ? genCircle() : genCross();
   return node.appendChild(shape);
-};
+});
 
-const markBoard = (board, index, mark) => {
-  board[index] = mark;
-  return board
-};
+function markBoard(board, index, mark) {
+  Caml_array.set(board, index, mark);
+  return board;
+}
 
-const celebrate = (result) => alert("Player 'result}' wins");
-const callDraw = () => alert("Draw game");
+var celebrate = ((result) => alert("Player " + result.toString() + " wins"));
+
+var callDraw = (() => alert("Draw game"));
+
 const showResult = (result) => {
   if (result === 1 || result === 2) {
     celebrate(result);
@@ -228,6 +230,12 @@ export {
   isFull ,
   marksInLine ,
   computeStatus ,
+  genCircle ,
+  genCross ,
+  drawMark ,
+  markBoard ,
+  celebrate ,
+  callDraw ,
   
 }
 /* lines Not a pure module */

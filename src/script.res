@@ -28,8 +28,8 @@ let computeStatus = (board, index, mark) =>
     in_game
   }
 
-%%raw(`
-const genCircle = () => {
+let genCircle = %raw(`
+() => {
   const circle = document.createElementNS(
     "http://www.w3.org/2000/svg", "circle"
   );
@@ -45,8 +45,10 @@ const genCircle = () => {
   circle.appendChild(title);
   return circle
 }
+`)
 
-const genCross = () => {
+let genCross = %raw(`
+() => {
   const cross = document.createElementNS(
     "http://www.w3.org/2000/svg", "path"
   );
@@ -60,18 +62,21 @@ const genCross = () => {
   cross.appendChild(title);
   return cross
 }
+`)
 
-const drawMark = (node, mark) => {
+let drawMark = %raw(`(node, mark) => {
   Array.from(node.childNodes).forEach(e => node.removeChild(e));
   const shape = mark === 1 ? genCircle() : genCross();
   return node.appendChild(shape);
-};
+}
+`)
 
-const markBoard = (board, index, mark) => {
-  board[index] = mark;
-  return board
-};
+let markBoard = (board, index, mark) => {
+  board[index] = mark
+  board
+}
 
+%%raw(`
 const celebrate = (result) => alert("Player 'result}' wins");
 const callDraw = () => alert("Draw game");
 const showResult = (result) => {
