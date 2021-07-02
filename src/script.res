@@ -1,47 +1,42 @@
-let draw = "draw";
-let in_game = "in game";
+let draw = 10
+let in_game = 9
 
-let rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
-let columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
-let diags = [[0, 4, 8], [2, 4, 6]];
-let lines = Belt.Array.concatMany([rows, columns, diags]);
+let rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+let columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
+let diags = [[0, 4, 8], [2, 4, 6]]
+let lines = Belt.Array.concatMany([rows, columns, diags])
 
 let game = {
   "status": in_game,
-  "current": true,
-  "board": [
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-  ]
+  "current": 1,
+  "board": Belt.Array.make(9, 0),
 }
 
-%%raw(`
-const isFull = (board) => board.every(cell => cell !== 0);
-const marksInLine = (board, index, mark) => lines
-  .filter(inds => inds.includes(index))
-  .some(inds => inds.every(ind => board[ind] === mark)
-);
-const computeStatus = (board, index, mark) => {
-  if (marksInLine(board, index, mark)) {
-    return mark
-  } else if (isFull(board)) {
-    return draw
+let line_width = 10
+
+let isFull = board => Belt.Array.every(board, cell => cell !== 0)
+let marksInLine = (board, index, mark) =>
+  Belt.Array.keep(lines, inds =>
+    Belt.Array.some(inds, ind => ind === index)
+  )->Belt.Array.some(inds => Belt.Array.every(inds, ind => board[ind] === mark))
+let computeStatus = (board, index, mark) =>
+  if marksInLine(board, index, mark) {
+    mark
+  } else if isFull(board) {
+    draw
   } else {
-    return in_game
+    in_game
   }
-};
 
-const LINE_WIDTH = 10;
-
+%%raw(`
 const genCircle = () => {
   const circle = document.createElementNS(
     "http://www.w3.org/2000/svg", "circle"
   );
   circle.setAttribute("stroke", "black");
   circle.setAttribute("fill", "transparent");
-  circle.setAttribute("stroke-width", LINE_WIDTH.toString());
-  circle.setAttribute("r", (LINE_WIDTH * 3.5).toString());
+  circle.setAttribute("stroke-width", line_width.toString());
+  circle.setAttribute("r", (line_width * 3.5).toString());
   circle.setAttribute("cx", "50%");
   circle.setAttribute("cy", "50%");
 
@@ -57,7 +52,7 @@ const genCross = () => {
   );
   cross.setAttribute("stroke", "black");
   cross.setAttribute("fill", "transparent");
-  cross.setAttribute("stroke-width", LINE_WIDTH.toString());
+  cross.setAttribute("stroke-width", line_width.toString());
   cross.setAttribute("d", "M 15,15 L 85,85 M 85,15 L 15,85");
 
   const title = document.createElement("title");
@@ -68,7 +63,7 @@ const genCross = () => {
 
 const drawMark = (node, mark) => {
   Array.from(node.childNodes).forEach(e => node.removeChild(e));
-  const shape = mark === true ? genCircle() : genCross();
+  const shape = mark === 1 ? genCircle() : genCross();
   return node.appendChild(shape);
 };
 
@@ -80,7 +75,7 @@ const markBoard = (board, index, mark) => {
 const celebrate = (result) => alert("Player 'result}' wins");
 const callDraw = () => alert("Draw game");
 const showResult = (result) => {
-  if (result === true || result === false) {
+  if (result === 1 || result === 2) {
     celebrate(result);
   } else if (result === draw) {
     callDraw();
@@ -106,7 +101,7 @@ const tickFlow = (e) => {
       game.board = board;
       game.status = status;
       if (game.status === in_game) {
-        game.current = !game.current;
+        game.current = game.current === 1? 2 : 1;
         node.removeEventListener("click", tickFlow);
       } else {
         document.querySelectorAll("#board > .cell")
@@ -138,7 +133,7 @@ const reset = (e) => {
   e.stopPropagation();
 
   game.status = in_game;
-  game.current = true;
+  game.current = 1;  // 1 for Circle; 2 for Cross
   game.board = [
     0, 0, 0,
     0, 0, 0,
