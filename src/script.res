@@ -76,17 +76,18 @@ let markBoard = (board, index, mark) => {
   board
 }
 
-%%raw(`
-const celebrate = (result) => alert("Player 'result}' wins");
-const callDraw = () => alert("Draw game");
-const showResult = (result) => {
-  if (result === 1 || result === 2) {
+let celebrate = %raw(`(result) => alert("Player " + result.toString() + " wins")`)
+let callDraw = %raw(`() => alert("Draw game")`)
+let showResult = (result) => {
+  if result === 1 || result === 2 {
     celebrate(result);
-  } else if (result === draw) {
+  } else if result === draw {
     callDraw();
   }
+  ()
 };
 
+%%raw(`
 const tickFlow = (e) => {
   e.preventDefault();
   e.stopPropagation();
