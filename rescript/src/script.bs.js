@@ -164,7 +164,7 @@ function tickFlow(e) {
   var match$1 = game.status;
   if (match$1 !== 0) {
     Belt_Array.forEach(document.querySelectorAll("#board > .cell"), (function (cell) {
-            cell.addEventListener("click", tickFlow);
+            cell.removeEventListener("click", tickFlow);
             
           }));
     return showResult(game.status);

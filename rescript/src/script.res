@@ -142,11 +142,9 @@ let rec tickFlow = (e): unit => {
         | X => game.current = O
         }
         removeEventListener(node, "click", tickFlow)
-      | O
-      | X
-      | Draw =>
+      | O | X | Draw =>
         querySelectorAll(document, "#board > .cell")->Belt.Array.forEach(cell => {
-          addEventListener(cell, "click", tickFlow)
+          removeEventListener(cell, "click", tickFlow)
         })
         showResult(game.status)
       }
