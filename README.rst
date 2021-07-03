@@ -3,7 +3,7 @@ ECMAScript and ReScript exercise
 
 [X] Make a valid tic-tac-toe game board use HTML5, CSS3, SVG, and minimal ECMAScript
 
-[ ] Replace ECMAScript with ReScript
+[X] Replace ECMAScript with ReScript
 
 [ ] Replace HTML5, CSS3, and SVG with React?
 
