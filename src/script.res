@@ -21,42 +21,54 @@ type rec htmlElement = {
 @send external createElementNS: (Dom.document, string, string) => htmlElement = "createElementNS"
 @send external createElement: (Dom.document, string) => htmlElement = "createElement"
 
-let draw = 10
-let in_game = 9
+type status =
+  | InGame
+  | X
+  | O
+  | Draw
 
-let rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
-let columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
-let diags = [[0, 4, 8], [2, 4, 6]]
-let lines = Belt.Array.concatMany([rows, columns, diags])
+type mark =
+  | X
+  | O
+
+type board = array<option<mark>>
 
 type game = {
-  mutable status: int,
-  mutable current: int,
-  mutable board: array<int>,
+  mutable status: status,
+  mutable current: mark,
+  mutable board: board,
 }
-let game = {
-  status: in_game,
-  current: 1, // 1 for Circle; 2 for Cross
-  board: Belt.Array.make(9, 0),
+let game: game = {
+  status: InGame,
+  current: O,
+  board: Belt.Array.make(9, None),
 }
+
+let lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+let isFull = (board): bool => Belt.Array.every(board, cell => cell !== None)
+
+let marksInLine = (board: board, mark: mark, index): bool =>
+  Belt.Array.keep(lines, inds =>
+    Belt.Array.some(inds, ind => ind === index)
+  )->Belt.Array.some(inds => Belt.Array.every(inds, ind => board[ind] === Some(mark)))
+
+let computeStatus = (board: board, mark: mark, index: int): status =>
+  if marksInLine(board, mark, index) {
+    if mark === O {
+      O
+    } else {
+      X
+    }
+  } else if isFull(board) {
+    Draw
+  } else {
+    InGame
+  }
 
 let line_width = 10.0
 
-let isFull = board => Belt.Array.every(board, cell => cell !== 0)
-let marksInLine = (board, index, mark) =>
-  Belt.Array.keep(lines, inds =>
-    Belt.Array.some(inds, ind => ind === index)
-  )->Belt.Array.some(inds => Belt.Array.every(inds, ind => board[ind] === mark))
-let computeStatus = (board, index, mark) =>
-  if marksInLine(board, index, mark) {
-    mark
-  } else if isFull(board) {
-    draw
-  } else {
-    in_game
-  }
-
-let genCircle = () => {
+let genCircle = (): htmlElement => {
   let circle = createElementNS(document, "http://www.w3.org/2000/svg", "circle")
   setAttribute(circle, "stroke", "black")
   setAttribute(circle, "fill", "transparent")
@@ -71,7 +83,7 @@ let genCircle = () => {
   circle
 }
 
-let genCross = () => {
+let genCross = (): htmlElement => {
   let cross = createElementNS(document, "http://www.w3.org/2000/svg", "path")
   setAttribute(cross, "stroke", "black")
   setAttribute(cross, "fill", "transparent")
@@ -84,34 +96,30 @@ let genCross = () => {
   cross
 }
 
-let drawMark = (node, mark) => {
+let drawMark = (node, mark): unit => {
   Belt.Array.forEach(node.childNodes, e => removeChild(node, e))
-  let shape = mark === 1 ? genCircle() : genCross()
-  appendChild(node, shape)
-  ()
-}
-
-let markBoard = (board, index, mark) => {
-  board[index] = mark
-  board
-}
-
-let celebrate = result => alert(`Player ${result} wins`)
-let callDraw = () => alert("Draw game")
-let showResult = result => {
-  if result === 1 || result === 2 {
-    celebrate(Belt.Int.toString(result))
-  } else if result === draw {
-    callDraw()
+  let shape = switch mark {
+  | O => genCircle()
+  | X => genCross()
   }
-  ()
+  appendChild(node, shape)
 }
 
-let rec tickFlow = e => {
+let showResult = (result: status): unit => {
+  switch result {
+  | O => alert("O wins!")
+  | X => alert("X wins!")
+  | Draw => alert("Draw game")
+  | InGame => ()
+  }
+}
+
+let rec tickFlow = (e): unit => {
   preventDefault(e)
   stopPropagation(e)
 
-  if game.status === in_game {
+  switch game.status {
+  | InGame =>
     let node = e.currentTarget
     let index =
       Belt.Array.keep(querySelector(document, "#board").children, e =>
@@ -120,16 +128,23 @@ let rec tickFlow = e => {
 
     switch index {
     | Some(index) =>
-      let board = markBoard(game.board, index, game.current)
-      drawMark(node, game.current)
-      let status = computeStatus(board, index, game.current)
+      game.board[index] = Some(game.current)
+      let current = game.current
+      drawMark(node, current)
+      let status = computeStatus(game.board, current, index)
 
-      game.board = board
       game.status = status
-      if game.status === in_game {
-        game.current = game.current === 1 ? 2 : 1
+      game.current = current
+      switch game.status {
+      | InGame =>
+        switch game.current {
+        | O => game.current = X
+        | X => game.current = O
+        }
         removeEventListener(node, "click", tickFlow)
-      } else {
+      | O
+      | X
+      | Draw =>
         querySelectorAll(document, "#board > .cell")->Belt.Array.forEach(cell => {
           addEventListener(cell, "click", tickFlow)
         })
@@ -137,12 +152,11 @@ let rec tickFlow = e => {
       }
     | None => () // TODO show notification?
     }
-  } else {
-    showResult(game.status)
+  | X | O | Draw => showResult(game.status)
   }
 }
 
-let resetBox = () => {
+let resetBox = (): unit => {
   querySelectorAll(document, "#board > .cell")->Belt.Array.forEach(cell => {
     Belt.Array.forEach(cell.childNodes, e => removeChild(cell, e))
     addEventListener(cell, "click", tickFlow)
@@ -151,13 +165,13 @@ let resetBox = () => {
 
 resetBox() // set up boxes
 
-let reset = e => {
+let reset = (e): unit => {
   preventDefault(e)
   stopPropagation(e)
 
-  game.status = in_game
-  game.current = 1
-  game.board = Belt.Array.make(9, 0)
+  game.status = InGame
+  game.current = O
+  game.board = Belt.Array.make(9, None)
   resetBox()
 }
 
